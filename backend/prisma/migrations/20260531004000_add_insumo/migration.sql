@@ -1,0 +1,11 @@
+-- CreateTable
+CREATE TABLE "Insumo" (
+    "id" SERIAL NOT NULL PRIMARY KEY,
+    "nombre" TEXT NOT NULL,
+    "cantidad" INTEGER NOT NULL DEFAULT 0,
+    "minimo" INTEGER NOT NULL DEFAULT 0,
+    "proveedor" TEXT,
+    "precio" DOUBLE PRECISION,
+    "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "updatedAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP
+);

@@ -1,0 +1,86 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+model Usuario {
+  id                  Int              @id @default(autoincrement())
+  nombre              String
+  email               String           @unique
+  password            String
+  rol                 String           @default("doctor")
+  foto                String?
+  createdAt           DateTime         @default(now())
+  pacientes           Paciente[]
+  citas               Cita[]
+  movimientos         MovimientoCaja[]
+  deudoresRegistrados DeudorCita[]
+}
+
+model Paciente {
+  id        Int          @id @default(autoincrement())
+  nombre    String
+  telefono  String
+  email     String?
+  foto      String?
+  createdAt DateTime     @default(now())
+  citas     Cita[]
+  doctor    Usuario?     @relation(fields: [doctorId], references: [id])
+  doctorId  Int?
+  deudores  DeudorCita[]
+}
+
+model Cita {
+  id         Int         @id @default(autoincrement())
+  fecha      DateTime
+  motivo     String
+  estado     String      @default("agendada")
+  duracion   Int         @default(30)
+  paciente   Paciente    @relation(fields: [pacienteId], references: [id])
+  pacienteId Int
+  doctor     Usuario?    @relation(fields: [doctorId], references: [id])
+  doctorId   Int?
+  createdAt  DateTime    @default(now())
+  deudor     DeudorCita?
+}
+
+model MovimientoCaja {
+  id        Int      @id @default(autoincrement())
+  tipo      String
+  categoria String
+  concepto  String
+  monto     Float
+  fecha     DateTime @default(now())
+  usuarioId Int
+  usuario   Usuario  @relation(fields: [usuarioId], references: [id])
+  createdAt DateTime @default(now())
+}
+
+model DeudorCita {
+  id              Int       @id @default(autoincrement())
+  citaId          Int       @unique
+  cita            Cita      @relation(fields: [citaId], references: [id], onDelete: Cascade)
+  pacienteId      Int
+  paciente        Paciente  @relation(fields: [pacienteId], references: [id])
+  monto           Float
+  concepto        String
+  estado          String    @default("PENDIENTE")
+  fechaPago       DateTime?
+  registradoPorId Int
+  registradoPor   Usuario   @relation(fields: [registradoPorId], references: [id])
+  createdAt       DateTime  @default(now())
+}
+
+model Insumo {
+  id        Int      @id @default(autoincrement())
+  nombre    String
+  cantidad  Int      @default(0)
+  minimo    Int      @default(0)
+  proveedor String?
+  precio    Float?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
