@@ -18,7 +18,25 @@ const PORT = process.env.PORT || 3000
 
 // Middlewares
 app.use(cors({
-  origin: process.env.FRONTEND_URL ? process.env.FRONTEND_URL.split(',') : '*',
+  origin: (origin, callback) => {
+    if (!origin) return callback(null, true)
+    
+    const hostnames = ['localhost', 'vercel.app']
+    let allowed = hostnames.some(h => origin.includes(h))
+    
+    if (process.env.FRONTEND_URL) {
+      const urls = process.env.FRONTEND_URL.split(',').map(u => u.trim())
+      if (urls.some(url => origin === url || origin.startsWith(url))) {
+        allowed = true
+      }
+    }
+    
+    if (allowed) {
+      callback(null, true)
+    } else {
+      callback(null, false)
+    }
+  },
   credentials: true,
 }))
 app.use(express.json({ limit: '5mb' }))
